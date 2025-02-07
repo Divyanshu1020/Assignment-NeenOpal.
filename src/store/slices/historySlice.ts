@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { HistoryState, HistoryAction } from '../types';
-import { updateNodeColor, updateNodeFontSize, updateNodePosition, updateNodeTextColor } from './graphSlice';
+import { UpdateNodeAddNewNode, updateNodeColor, updateNodeFontSize, updateNodePosition, updateNodeTextColor } from './graphSlice';
 import { AppDispatch } from '../store';
 
 const initialState: HistoryState = {
@@ -55,6 +55,9 @@ export const handleUndo = () => (dispatch: AppDispatch, getState: () => any) => 
       case 'textColor':
         dispatch(updateNodeTextColor({ nodeId: action.nodeId, textColor: action.prev }));
         break;
+      case 'addNewNode':
+        dispatch(UpdateNodeAddNewNode({ nodeId: action.nodeId, node: action.prev }));
+        break;
     }
     dispatch(undo());
   }
@@ -98,6 +101,9 @@ export const handleRedo = () => (dispatch: AppDispatch, getState: () => any) => 
         break;
       case 'textColor':
         dispatch(updateNodeTextColor({ nodeId: action.nodeId, textColor: action.next }));
+        break;
+      case 'addNewNode':
+        dispatch(UpdateNodeAddNewNode({ nodeId: action.nodeId, node: action.next }));
         break;
     }
     dispatch(redo());
