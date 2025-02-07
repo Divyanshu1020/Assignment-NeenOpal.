@@ -1,9 +1,10 @@
-import { Node, Edge } from '@xyflow/react';
+import { Edge, Node } from "@xyflow/react";
 
 export interface NodeData {
   label: string;
   color: string;
   fontSize: number;
+  textColor: string;
   [key: string]: unknown;
 }
 
@@ -14,10 +15,10 @@ export interface GraphState {
 }
 
 export interface HistoryAction {
-  type: 'color' | 'fontSize' | 'position';
+  type: "color" | "fontSize" | "position" | "textColor" | "addNewNode";
   nodeId: string;
-  prev: string;
-  next: string;
+  prev: string | number | undefined | Position | Node<NodeData> | null;
+  next: string | number | undefined | Position | Node<NodeData> | null;
 }
 
 export interface Position {

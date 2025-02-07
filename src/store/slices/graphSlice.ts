@@ -21,11 +21,13 @@ const generateInitialNodes = (): Node<NodeData>[] => {
       data: {
         label: `Node ${i + 1}`,
         color: '#ffffff',
-        fontSize: 14,
+        // bg: 'bg-[#ffffff]',
+        textColor: '#000000',
+        fontSize: 12,
       },
       style: {
-        background: '#ffffff',
-        fontSize: 14,
+        // background: '#000000',
+        // fontSize: 14,
       },
     });
   }
@@ -66,12 +68,12 @@ const graphSlice = createSlice({
     },
     updateNodeColor: (
       state,
-      action: PayloadAction<{ nodeId: string; color: string }>
+      action: PayloadAction<{ nodeId: string; color: string; }>
     ) => {
       const node = state.nodes.find((n) => n.id === action.payload.nodeId);
       if (node) {
         node.data.color = action.payload.color;
-        node.style = { ...node.style, background: action.payload.color };
+        // node.style = { ...node.style, background: action.payload.color };
       }
     },
     updateNodeFontSize: (
@@ -99,6 +101,15 @@ const graphSlice = createSlice({
         node.data.label = action.payload.label;
       }
     },
+    updateNodeTextColor: (
+      state,
+      action: PayloadAction<{ nodeId: string; textColor: string }>
+    ) => {
+      const node = state.nodes.find((n) => n.id === action.payload.nodeId);
+      if (node) {
+        node.data.textColor = action.payload.textColor;
+      }
+    },
   },
 });
 
@@ -109,7 +120,8 @@ export const {
   updateNodeColor,
   updateNodeFontSize,
   updateNodePosition,
-  updateNodeLabel
+  updateNodeLabel,
+  updateNodeTextColor
 } = graphSlice.actions;
 
 export default graphSlice.reducer;
