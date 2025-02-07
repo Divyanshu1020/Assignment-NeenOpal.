@@ -4,52 +4,70 @@ import { GraphState, NodeData, Position } from '../types';
 
 const generateInitialNodes = (): Node<NodeData>[] => {
   const nodes: Node<NodeData>[] = [];
-  const radius = 200;
-  const centerX = 400;
-  const centerY = 300;
+  const startX = 200; // Starting X position
+  const startY = 200; // Starting Y position
+  const gapX = 200; // Horizontal spacing
+  const gapY = 150; // Vertical spacing
 
   for (let i = 0; i < 10; i++) {
-    const angle = (i * 2 * Math.PI) / 10;
+    const row = Math.floor(i / 5); // 0 for first row, 1 for second row
+    const col = i % 5; // Column index
+
     nodes.push({
       id: `${i + 1}`,
       type: 'customNode',
       draggable: true,
       position: {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
+        x: startX + col * gapX,
+        y: startY + row * gapY,
       },
       data: {
         label: `Node ${i + 1}`,
         color: '#ffffff',
-        // bg: 'bg-[#ffffff]',
         textColor: '#000000',
         fontSize: 12,
       },
-      style: {
-        // background: '#000000',
-        // fontSize: 14,
-      },
     });
   }
+
   return nodes;
 };
 
 const generateInitialEdges = (): Edge[] => {
   const edges: Edge[] = [];
-  for (let i = 1; i <= 10; i++) {
-    edges.push({
-      id: `e${i}-${i % 10 + 1}`,
-      source: `${i}`,
-      target: `${i % 10 + 1}`,
-      animated: true,
-    });
+
+  for (let i = 0; i < 10; i++) {
+    const row = Math.floor(i / 5);
+    const col = i % 5;
+
+    // Horizontal connection (except last node in each row)
+    if (col < 4) {
+      edges.push({
+        id: `e${i + 1}-${i + 2}`,
+        source: `${i + 1}`,
+        target: `${i + 2}`,
+        animated: true,
+      });
+    }
+
+    // Vertical connection (connect rows)
+    if (row === 0) {
+      edges.push({
+        id: `e${i + 1}-${i + 6}`,
+        source: `${i + 1}`,
+        target: `${i + 6}`,
+        animated: true,
+      });
+    }
   }
+
   return edges;
 };
 
+
 const initialState: GraphState = {
   nodes: generateInitialNodes(),
-  edges: [],
+  edges: generateInitialEdges(),
   selectedNode: null,
 };
 

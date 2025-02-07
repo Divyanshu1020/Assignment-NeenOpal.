@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { Undo2, Redo2 } from "lucide-react";
+import { Undo2, Redo2, X, Menu } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectNodes, selectSelectedNode } from "../store/store";
 import {
@@ -21,6 +21,7 @@ export const Sidebar: React.FC = () => {
   const selectedNode = useSelector(selectSelectedNode);
   const nodes = useSelector(selectNodes);
   const [activeTab, setActiveTab] = useState<"bg" | "text">("bg");
+  const [isOpen, setIsOpen] = useState(false); // Sidebar toggle state
 
   const selectedNodeData = selectedNode
     ? nodes.find((n) => n.id === selectedNode)?.data
@@ -71,45 +72,57 @@ export const Sidebar: React.FC = () => {
     }
   };
 
-  if (!selectedNode) {
-    return (
-      <div className="w-64 bg-white p-4 shadow-lg">
-        <h2 className="text-lg font-semibold mb-4">Node Editor</h2>
-        <p className="text-gray-500">Select a node to edit its properties</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-64 bg-white p-4 shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Node Editor</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => dispatch(handleUndo())}
-            // onClick={handleUndo}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            title="Undo"
-          >
-            <Undo2 size={20} />
-          </button>
-          <button
-            onClick={() => dispatch(handleRedo())}
-          //  onClick={handleRedo}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            title="Redo"
-          >
-            <Redo2 size={20} />
-          </button>
-        </div>
-      </div>
+    <>
+      {/* Toggle Button for Mobile (Right Side) */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className={` ${isOpen ? "hidden" : ""} fixed top-4 right-4 z-50 md:hidden p-2 bg-gray-800 text-white rounded-md shadow-md`}
+      >
+        <Menu size={24} />
+      </button>
 
-      <div className="space-y-4">
+      {/* Sidebar */}
+      <div
+        className={`z-50 fixed top-0 right-0 h-full w-64 bg-white p-4 shadow-lg transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "translate-x-full"} md:relative md:translate-x-0 md:w-64`}
+      >
+        {/* Close Button for Mobile */}
+        {/* <button
+          onClick={() => setIsOpen(false)}
+          className="absolute top-3 left-3 md:hidden text-gray-600 hover:text-black"
+        >
+          <X size={24} />
+        </button> */}
+
+        {/* Header with Undo/Redo */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Node Editor</h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => dispatch(handleUndo())}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              title="Undo"
+            >
+              <Undo2 size={20} />
+            </button>
+            <button
+              onClick={() => dispatch(handleRedo())}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              title="Redo"
+            >
+              <Redo2 size={20} />
+            </button>
+          </div>
+        </div>
+
         {/* Tabs for Background & Text Color */}
         <div className="flex border-b">
           <button
             className={`flex-1 text-center py-2 ${
-              activeTab === "bg" ? "border-b-2 border-blue-500 font-semibold" : ""
+              activeTab === "bg"
+                ? "border-b-2 border-blue-500 font-semibold"
+                : ""
             }`}
             onClick={() => setActiveTab("bg")}
           >
@@ -117,7 +130,9 @@ export const Sidebar: React.FC = () => {
           </button>
           <button
             className={`flex-1 text-center py-2 ${
-              activeTab === "text" ? "border-b-2 border-blue-500 font-semibold" : ""
+              activeTab === "text"
+                ? "border-b-2 border-blue-500 font-semibold"
+                : ""
             }`}
             onClick={() => setActiveTab("text")}
           >
@@ -125,8 +140,8 @@ export const Sidebar: React.FC = () => {
           </button>
         </div>
 
-        {/* Color Picker for Selected Tab */}
-        <div>
+        {/* Color Picker */}
+        <div className="mt-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {activeTab === "bg" ? "Node Background Color" : "Node Text Color"}
           </label>
@@ -138,7 +153,7 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Font Size Selector */}
-        <div>
+        <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Font Size
           </label>
@@ -159,6 +174,14 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Overlay for Mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+    </>
   );
 };
