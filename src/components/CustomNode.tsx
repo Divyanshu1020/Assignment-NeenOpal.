@@ -1,5 +1,5 @@
-import { memo, useCallback, useState } from "react";
-import { Handle, Position, NodeProps, Node } from "@xyflow/react";
+import { memo, useCallback, useRef, useState } from "react";
+import { Handle, Position, NodeProps, Node, NodeResizer  } from "@xyflow/react";
 import { useDispatch } from "react-redux";
 import { Check } from "lucide-react"; // Import tick icon
 import { updateNodeLabel } from "../store/slices/graphSlice";
@@ -9,6 +9,7 @@ const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
   const dispatch = useDispatch();
   const [labelText, setLabelText] = useState(data.label);
   const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null); // Ref for input field
 
   // Handle text input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +33,7 @@ const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
 
   // Handle keyboard actions
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    inputRef.current?.blur();
     if (event.key === "Enter") handleConfirm();
     if (event.key === "Escape") handleCancel();
   };
@@ -41,18 +43,20 @@ const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
       style={{ backgroundColor: data.color, fontSize: data.fontSize }}
       className="p-2 rounded-xl shadow-md relative flex items-center gap-2"
     >
+        
       {/* Floating Handles for Connections */}
       <Handle type="source" position={Position.Right} />
       <Handle type="target" position={Position.Left} />
 
       {/* Editable Text Input */}
       <input
+        ref={inputRef}
         type="text"
         value={labelText}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onBlur={handleCancel} // Reset if clicked outside
-        className="border-none outline-none text-xs text-center w-full bg-transparent rounded-lg"
+        className="border-none outline-none text-xs text-center w-full bg-transparent rounded-lg cursor-grab"
         style={{ fontSize: data.fontSize, color: data.textColor }}
       />
 
