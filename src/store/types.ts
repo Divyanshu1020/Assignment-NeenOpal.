@@ -15,7 +15,7 @@ export interface GraphState {
 }
 
 export interface HistoryAction {
-  type: "color" | "fontSize" | "position" | "textColor" | "addNewNode";
+  type: "color" | "fontSize" | "position" | "textColor" | "addNewNode" | "deleteNode" | "label";
   nodeId: string;
   prev: string | number | undefined | Position | Node<NodeData> | null;
   next: string | number | undefined | Position | Node<NodeData> | null;

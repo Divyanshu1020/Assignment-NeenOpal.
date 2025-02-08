@@ -134,7 +134,14 @@ const graphSlice = createSlice({
       } else {
         state.nodes.push(action.payload.node);
       }
-    }
+    },
+    deleteNode: (state, action: PayloadAction<{ nodeId: string, node?: Node<NodeData> | null }>) => {
+      if (action.payload.node === null){
+        state.nodes = state.nodes.filter((n) => n.id !== action.payload.nodeId);
+      } else if (action.payload.node !== undefined) {
+        state.nodes.push(action.payload.node);
+      }
+    },
   },
 });
 
@@ -148,6 +155,7 @@ export const {
   updateNodeLabel,
   updateNodeTextColor,
   UpdateNodeAddNewNode,
+  deleteNode
 } = graphSlice.actions;
 
 export default graphSlice.reducer;

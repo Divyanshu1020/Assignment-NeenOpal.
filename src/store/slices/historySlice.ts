@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { HistoryState, HistoryAction } from '../types';
-import { UpdateNodeAddNewNode, updateNodeColor, updateNodeFontSize, updateNodePosition, updateNodeTextColor } from './graphSlice';
+import { deleteNode, UpdateNodeAddNewNode, updateNodeColor, updateNodeFontSize, updateNodeLabel, updateNodePosition, updateNodeTextColor } from './graphSlice';
 import { AppDispatch } from '../store';
 
 const initialState: HistoryState = {
@@ -58,6 +58,12 @@ export const handleUndo = () => (dispatch: AppDispatch, getState: () => any) => 
       case 'addNewNode':
         dispatch(UpdateNodeAddNewNode({ nodeId: action.nodeId, node: action.prev }));
         break;
+      case 'deleteNode':
+        dispatch(deleteNode({ nodeId: action.nodeId, node: action.prev }));
+        break;
+      case 'label':
+        dispatch(updateNodeLabel({ nodeId: action.nodeId, label: action.prev }));
+        break;
     }
     dispatch(undo());
   }
@@ -104,6 +110,12 @@ export const handleRedo = () => (dispatch: AppDispatch, getState: () => any) => 
         break;
       case 'addNewNode':
         dispatch(UpdateNodeAddNewNode({ nodeId: action.nodeId, node: action.next }));
+        break;
+      case 'deleteNode':
+        dispatch(deleteNode({ nodeId: action.nodeId, node: action.next }));
+        break;
+      case 'label':
+        dispatch(updateNodeLabel({ nodeId: action.nodeId, label: action.next }));
         break;
     }
     dispatch(redo());

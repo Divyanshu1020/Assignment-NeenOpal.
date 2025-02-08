@@ -1,23 +1,26 @@
-import React, { useState } from "react";
+import { Menu, Redo2, Trash2, Undo2, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { HexColorPicker } from "react-colorful";
-import { Undo2, Redo2, X, Menu } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectNodes, selectSelectedNode } from "../store/store";
 import {
+  deleteNode,
+  setSelectedNode,
   updateNodeColor,
   updateNodeFontSize,
   updateNodeTextColor,
 } from "../store/slices/graphSlice";
 import {
   addHistoryAction,
-  handleUndo,
   handleRedo,
+  handleUndo,
 } from "../store/slices/historySlice";
+import { selectNodes, selectSelectedNode } from "../store/store";
 
 const fontSizes = [12, 14, 16, 18, 20, 22, 24];
 
 export const Sidebar: React.FC = () => {
   const dispatch = useDispatch();
+  // const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const selectedNode = useSelector(selectSelectedNode);
   const nodes = useSelector(selectNodes);
   const [activeTab, setActiveTab] = useState<"bg" | "text">("bg");
@@ -72,30 +75,53 @@ export const Sidebar: React.FC = () => {
     }
   };
 
+  const handleDeleteNode = () => {
+    if (selectedNode) {
+      const deletedNode = nodes.find((n) => n.id === selectedNode);
+  
+      if (deletedNode) {
+        dispatch(
+          addHistoryAction({
+            type: "deleteNode",
+            nodeId: selectedNode,
+            prev: deletedNode, // Store the deleted node's data for undo
+            next: null,
+          })
+        );
+      }
+  
+      dispatch(deleteNode({ nodeId: selectedNode, node: null }));
+      dispatch(setSelectedNode(null));
+      setIsOpen(false); // Close sidebar after deletion
+
+    }
+  };
+
+  // useEffect(()=>{
+  //   setSelectedNode(selectedNodeReducer)
+  // },[selectedNodeReducer])
+  
+
   return (
     <>
       {/* Toggle Button for Mobile (Right Side) */}
       <button
         onClick={() => setIsOpen(true)}
-        className={` ${isOpen ? "hidden" : ""} fixed top-4 right-4 z-50 md:hidden p-2 bg-gray-800 text-white rounded-md shadow-md`}
+        className={` ${
+          isOpen ? "hidden" : ""
+        } fixed top-4 right-4 z-50 md:hidden p-2 bg-gray-800 text-white rounded-md shadow-md`}
       >
         <Menu size={24} />
       </button>
 
       {/* Sidebar */}
-      <div
+      { selectedNode && <div
         className={`z-50 fixed top-0 right-0 h-full w-64 bg-white p-4 shadow-lg transform transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "translate-x-full"} md:relative md:translate-x-0 md:w-64`}
+          ${
+            isOpen ? "translate-x-0" : "translate-x-full"
+          } md:relative md:translate-x-0 md:w-64`}
       >
-        {/* Close Button for Mobile */}
-        {/* <button
-          onClick={() => setIsOpen(false)}
-          className="absolute top-3 left-3 md:hidden text-gray-600 hover:text-black"
-        >
-          <X size={24} />
-        </button> */}
-
-        {/* Header with Undo/Redo */}
+        {/* Header with Undo/Redo and Close Button */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Node Editor</h2>
           <div className="flex gap-2">
@@ -146,8 +172,14 @@ export const Sidebar: React.FC = () => {
             {activeTab === "bg" ? "Node Background Color" : "Node Text Color"}
           </label>
           <HexColorPicker
-            color={activeTab === "bg" ? selectedNodeData?.color : selectedNodeData?.textColor}
-            onChange={activeTab === "bg" ? handleColorChange : handleTextColorChange}
+            color={
+              activeTab === "bg"
+                ? selectedNodeData?.color
+                : selectedNodeData?.textColor
+            }
+            onChange={
+              activeTab === "bg" ? handleColorChange : handleTextColorChange
+            }
             className="w-full"
           />
         </div>
@@ -173,7 +205,18 @@ export const Sidebar: React.FC = () => {
             ))}
           </div>
         </div>
-      </div>
+
+        {/* Delete Node Button */}
+        <div className="mt-4">
+          <button
+            onClick={handleDeleteNode}
+            className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 flex items-center justify-center gap-2"
+          >
+            <Trash2 size={20} />
+            Delete Node
+          </button>
+        </div>
+      </div>}
 
       {/* Overlay for Mobile */}
       {isOpen && (

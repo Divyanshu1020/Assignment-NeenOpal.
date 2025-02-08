@@ -1,15 +1,16 @@
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Handle, Position, NodeProps, Node, NodeResizer  } from "@xyflow/react";
 import { useDispatch } from "react-redux";
 import { Check } from "lucide-react"; // Import tick icon
 import { updateNodeLabel } from "../store/slices/graphSlice";
 import { NodeData } from "../store/types";
+import { addHistoryAction } from "../store/slices/historySlice";
 
 const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
   const dispatch = useDispatch();
   const [labelText, setLabelText] = useState(data.label);
   const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null); // Ref for input field
+  // const inputRef = useRef<HTMLInputElement>(null); // Ref for input field
 
   // Handle text input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,22 +22,37 @@ const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
   const handleConfirm = useCallback(() => {
     if (labelText.trim() !== data.label) {
       dispatch(updateNodeLabel({ nodeId: id, label: labelText.trim() }));
+      dispatch(
+        addHistoryAction({
+          type: "label",
+          nodeId: id,
+          prev: data.label,
+          next: labelText.trim(),
+        })
+      )
     }
     setIsEditing(false);
+    // inputRef.current?.blur();
+    document.getElementById("node-input")?.blur();
   }, [dispatch, id, labelText, data.label]);
 
   // Handle cancel (Escape key or clicking outside)
   const handleCancel = useCallback(() => {
     setLabelText(data.label); // Reset input
     setIsEditing(false);
+    // inputRef.current?.blur();
+    document.getElementById("node-input")?.blur();
   }, [data.label]);
 
   // Handle keyboard actions
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    inputRef.current?.blur();
     if (event.key === "Enter") handleConfirm();
     if (event.key === "Escape") handleCancel();
   };
+
+  useEffect(() => {
+    setLabelText(data.label);
+  },[data.label]);
 
   return (
     <div
@@ -50,7 +66,7 @@ const CustomNode = ({ id, data }: NodeProps<Node<NodeData>>) => {
 
       {/* Editable Text Input */}
       <input
-        ref={inputRef}
+        id="node-input"
         type="text"
         value={labelText}
         onChange={handleChange}
